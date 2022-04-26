@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     myDBHelper myHelper;
     EditText edtName, edtNumber, edtNameResult, edtNumberResult;
-    Button btnInit, btnInsert, btnSelect;
+    Button btnInit, btnInsert, btnSelect, btnUpdate, btnDelete;
     SQLiteDatabase sqlDB;
 
     @Override
@@ -33,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
         btnInit = (Button) findViewById(R.id.btnInit);
         btnInsert = (Button) findViewById(R.id.btnInsert);
         btnSelect = (Button) findViewById(R.id.btnSelect);
+        btnUpdate = (Button) findViewById(R.id.btnUpdate);
+        btnDelete = (Button) findViewById(R.id.btnDelete);
+
 
         myHelper = new myDBHelper(this);
         btnInit.setOnClickListener(new View.OnClickListener() {
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                 myHelper.onUpgrade(sqlDB, 1, 2);
                 sqlDB.close();
 
+                btnSelect.callOnClick();
             }
         });
 
@@ -52,8 +56,13 @@ public class MainActivity extends AppCompatActivity {
                 sqlDB.execSQL("INSERT INTO groupTBL VALUES ( '"
                         + edtName.getText().toString() + "', "
                         + edtNumber.getText().toString() + ");");
+                // INSERT INTO table VALUES ('name',number);
                 sqlDB.close();
                 Toast.makeText(getApplicationContext(), "입력됨", Toast.LENGTH_SHORT).show();
+                edtName.setText("");
+                edtNumber.setText("");
+
+                btnSelect.callOnClick();
             }
         });
 
@@ -77,6 +86,44 @@ public class MainActivity extends AppCompatActivity {
 
                 cursor.close();
                 sqlDB.close();
+
+                edtName.setText("");
+                edtNumber.setText("");
+            }
+        });
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sqlDB = myHelper.getWritableDatabase();
+
+                //UPDATE groupTBL SET gNumber = 'edtNumber' WHERE gName = 'edtName';
+                sqlDB.execSQL("UPDATE groupTBL SET gNumber = "
+                        + edtNumber.getText().toString() + " WHERE gName = '"
+                        + edtName.getText().toString() + "';");
+
+                sqlDB.close();
+                btnSelect.callOnClick();
+
+                edtName.setText("");
+                edtNumber.setText("");
+            }
+        });
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sqlDB = myHelper.getWritableDatabase();
+
+                //DELETE FROM table WHERE gName = "groupName";
+                sqlDB.execSQL("DELETE FROM groupTBL WHERE gName ='"
+                        + edtName.getText().toString() + "';");
+
+                sqlDB.close();
+                btnSelect.callOnClick();
+
+                edtName.setText("");
+                edtNumber.setText("");
             }
         });
     }
